@@ -1,0 +1,2 @@
+FROM messense/rust-musl-cross:aarch64-musl
+COPY upx /usr/bin/
