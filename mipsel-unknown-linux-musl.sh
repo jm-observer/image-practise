@@ -1,0 +1,1 @@
+docker build -f mipsel-unknown-linux-musl/Dockerfile -t huangjiemin/musl-upx-openssl:mipsel_1.62.0_stable .
