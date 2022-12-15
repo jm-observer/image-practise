@@ -1,0 +1,36 @@
+changelog-seen = 2
+
+[llvm]
+ninja = true
+targets = "Mips;X86"
+[build]
+host = ["x86_64-unknown-linux-gnu"]
+# 必须要有host的target，不然会报找不到std、code等错误
+target = ["x86_64-unknown-linux-gnu", "mipsel-unknown-linux-uclibc"]
+# 必须要有，不然cargo不了
+extended = true
+# 找机会删减下
+tools = ["cargo", "src"]
+
+cargo = "/usr/local/cargo/bin/cargo"
+rustc = "/usr/local/cargo/bin/rustc"
+rustfmt = "/usr/local/cargo/bin/rustfmt"
+docs = false
+
+
+[install]
+prefix = "/opt/rust1.65.0"
+sysconfdir = "etc"
+docdir = "share/doc/rust"
+bindir = "bin"
+libdir = "lib"
+mandir = "share/man"
+
+[rust]
+# 应该可以不用
+[target.mipsel-unknown-linux-uclibc]
+cc = "mipsel-openwrt-linux-uclibc-gcc"
+cxx = "mipsel-openwrt-linux-uclibc-c++"
+ar = "mipsel-openwrt-linux-uclibc-ar"
+linker = "mipsel-openwrt-linux-uclibc-gcc"
+[dist]

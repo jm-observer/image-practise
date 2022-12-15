@@ -1,2 +1,5 @@
 /target
 .idea
+openssl.tar
+toolchain-mipsel_1004kc_gcc-8.5.0_uClibc-1.0.x.tar.z
+rust-openwrt-toolchain.tar
