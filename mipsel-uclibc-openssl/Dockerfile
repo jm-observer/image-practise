@@ -4,7 +4,7 @@ FROM tmp/tmp-rust:latest AS build-4
 
 FROM rust:1.65.0-slim-bullseye
 COPY --from=build-1 /opt/toolchain-mipsel_1004kc_gcc-8.5.0_uClibc-1.0.x /opt/toolchain-mipsel_1004kc_gcc-8.5.0_uClibc-1.0.x
-COPY --from=build-2 /opt/upx-3.95-amd64_linux/upx /usr/bin/upx
+COPY --from=build-1 /opt/upx-3.95-amd64_linux/upx /usr/bin/upx
 COPY --from=build-2 /opt/openssl-1.0.2u-uclibc /opt/openssl-1.0.2u-uclibc
 COPY --from=build-4 /opt/rust1.65.0 /opt/rust1.65.0
 
