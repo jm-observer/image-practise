@@ -27,8 +27,9 @@ libdir = "lib"
 mandir = "share/man"
 
 [rust]
+# 应该可以不用
 [target.x86_64-unknown-linux-gnu]
-llvm-config = "/opt/llvm/bin/llvm-config"
+llvm-config = "/opt/llvm/"
 [target.mipsel-unknown-linux-uclibc]
 cc = "mipsel-openwrt-linux-uclibc-gcc"
 cxx = "mipsel-openwrt-linux-uclibc-c++"
