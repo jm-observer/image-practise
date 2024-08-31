@@ -1,0 +1,42 @@
+FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.5 AS build-1
+
+# toolchain
+WORKDIR /opt/
+RUN apt-get update && \
+        apt-get install -y xz-utils && \
+        apt-get remove -y && \
+        apt-get clean &&  \
+        curl -L -o upx-3.95-amd64_linux.tar.xz https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz    &&  \
+        tar -xvf upx-3.95-amd64_linux.tar.xz
+RUN curl -L -o openssl-1.1.0l.tar.gz https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz &&  \
+    tar -xvf /opt/openssl-1.1.0l.tar.gz
+WORKDIR /opt/openssl-1.1.0l
+ENV MACHINE=aarch64
+ENV SYSTEM=Linux
+ENV ARCH=aarch64
+
+RUN ./config no-asm no-shared no-async -fPIC --prefix=/opt/openssl-1.1.0l-aarch64 --cross-compile-prefix=aarch64-linux-gnu- &&  \
+    mkdir /opt/openssl-1.1.0l-aarch64  &&\
+    make -j4  &&\
+    make install
+
+FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.5
+
+WORKDIR /opt/
+ENV PATH=/root/.cargo/bin:$PATH
+RUN apt-get update && \
+    apt-get install -y openssh-client iputils-ping  && \
+    apt-get remove -y && \
+    apt-get clean &&  \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y   &&  \
+    rustup target add aarch64-unknown-linux-gnu && \
+    git config --global credential.helper store && \
+    ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ''
+
+COPY --from=build-1 /opt/openssl-1.1.0l-aarch64 /opt/openssl-1.1.0l
+COPY --from=build-1 /opt/upx-3.95-amd64_linux/upx /usr/bin/upx
+ENV AARCH64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/opt/openssl-1.1.0l/lib
+ENV CARGO_BUILD_TARGET=aarch64-unknown-linux-gnu
+ENV AARCH64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/opt/openssl-1.1.0l/include
+
+WORKDIR /root/src
