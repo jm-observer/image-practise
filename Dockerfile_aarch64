@@ -1,3 +1,17 @@
+# Dockerfile for aarch64 cross-compilation environment
+# 
+# Version Information:
+# - OpenSSL: 1.1.0l
+# - Rust: 1.88.0
+# - UPX: 3.95
+# - Cross-compilation target: aarch64-unknown-linux-gnu
+#
+# Build and Push Commands:
+# 1. Build image: docker build -f Dockerfile_aarch64 -t huangjiemin/aarch64-cross-compile .
+# 2. Tag image: docker tag aarch64-cross-compile huangjiemin/rust_aarch64-gcc_openssl:1.88.0_9.4.0_1.1.0l
+# 3. Login to Docker Hub: docker login
+# 6. Push version tag: docker push huangjiemin/rust_aarch64-gcc_openssl:1.88.0_9.4.0_1.1.0l
+
 FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.5 AS build-1
 
 # toolchain
@@ -8,6 +22,8 @@ RUN apt-get update && \
         apt-get clean &&  \
         curl -L -o upx-3.95-amd64_linux.tar.xz https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz    &&  \
         tar -xvf upx-3.95-amd64_linux.tar.xz
+
+# Install OpenSSL 1.1.0l for aarch64 cross-compilation
 RUN curl -L -o openssl-1.1.0l.tar.gz https://www.openssl.org/source/old/1.1.0/openssl-1.1.0l.tar.gz &&  \
     tar -xvf /opt/openssl-1.1.0l.tar.gz
 WORKDIR /opt/openssl-1.1.0l
@@ -24,11 +40,13 @@ FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.5
 
 WORKDIR /opt/
 ENV PATH=/root/.cargo/bin:$PATH
+
+# Install system packages and Rust 1.88.0
 RUN apt-get update && \
     apt-get install -y openssh-client iputils-ping  && \
     apt-get remove -y && \
     apt-get clean &&  \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y   &&  \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.88.0   &&  \
     rustup target add aarch64-unknown-linux-gnu && \
     git config --global credential.helper store && \
     ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ''
